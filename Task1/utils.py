@@ -1,4 +1,4 @@
-import Levenshtein
+import heapq
 import pandas as pd
 from itertools import product
 
@@ -14,57 +14,62 @@ class spellChecker:
             content = f.readlines()
         content = [x.strip() for x in content]
         self.content=pd.DataFrame(content,columns=['word'])
+        self.content=list(self.content['word'])
         
 
     def checkIfExist(self,word):
-        if word in self.content['word'].values:
+        if word in self.content:
             return True
         else:
             return False
-    def generate_combinations(self,combination_length):
-        """
-        This function takes a number and generate all possible combinations of the alphabet with this length
-        Time complexity is O(m!) where m is the number of the combinations
-        """
-        characters = 'abcdefghijklmnopqrstuvwxyz'
-        combinations = [''.join(combo) for combo in product(characters, repeat=combination_length)]
-        return combinations
-    #Suppose length of the dictionary is m and the lenght of the input word is n
-    # the time complexity of this function is O(n*m+m+ m log m) which is O(n*m)
-    # The space complexity is O(m)     
-    def getNearst4Words(self,input_word):
-        """
-        This function takes a word and return the 4 nearest words to it
-        by looking for the most similar words to it in the dictionary
-        
-        """
-        # hello
-        # hella
-        # hellb
-        #  
 
-        self.highPriority = pd.DataFrame()
-        self.lookFor=self.content
-        for (i,char) in enumerate(input_word):
-            self.prob=self.lookFor[self.lookFor['word'].str[0:i]==input_word[0:i]]
-            self.nxt=len(self.prob)
-            if(self.nxt==0):
-                subset=input_word[0:i-1]
-                cur=i
-                while (len(self.highPriority)<4)and i>0:
-                    i-=1
-                    #here we are looking for the words that have the same prefix as the input word and go backward
-                    self.highPriority=self.content[self.content['word'].str[0:i]==input_word[0:i]]
-                break
-            else:
-                self.highPriority=self.prob
-                self.lookFor=self.prob
-        return self.highPriority.sort_values(by=['word'])[0:4].values[:,0]
+
+    def find_closest_strings_indices(self, input_string):
+        def longest_common_prefix(str1, str2):
+            length = min(len(str1), len(str2))
+            common_prefix = ""
+            for i in range(length):
+                if str1[i] != str2[i]:
+                    break
+                common_prefix += str1[i]
+            return common_prefix
+
+        def binary_search_closest( target, heap):
+            left, right = 0, len(self.content) - 1
+
+            while left <= right:
+                mid = (left + right) // 2
+                current_word = self.content[mid]
+                common_prefix = longest_common_prefix(current_word, target)
+
+                if len(heap) < 4:
+                    heapq.heappush(heap, (len(common_prefix), mid))
+                else:
+                    heapq.heappushpop(heap, (len(common_prefix), mid))
+
+                if target < current_word:
+                    right = mid - 1
+                else:
+                    left = mid + 1
+
+        # Sort the words list to enable binary search
+        self.content.sort()
+
+        # Create a max-heap (min-heap with negated values) to track top 4 similarities
+        top_similarities = []
+
+        # Perform binary search to find top 4 similar words
+        binary_search_closest( input_string, top_similarities)
+
+        # Retrieve the indices of the top 4 similar words
+        top4SimilarWords = [self.content[index] for _, index in top_similarities]
+
+        return top4SimilarWords
     def doWork(self,word):
         if self.checkIfExist(word):
             return "The Word Exist"
         else:
-            return self.getNearst4Words(word)
+            return self.find_closest_strings_indices(word)
     #The time complexity of this function is O(m) where m is the number of columns of teh Data Frame
     #So for each addWord operation the time complexity is O(1) 
     #The space complexity is O(m) where m is the number of columns of teh Data Frame
@@ -72,5 +77,5 @@ class spellChecker:
         if self.checkIfExist(word):
             return False
         else:
-            self.content[word].append(word)
+            self.content.append(word)
             return True
