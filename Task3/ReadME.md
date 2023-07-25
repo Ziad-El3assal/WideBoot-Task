@@ -2,6 +2,7 @@
   1) Data Normalization: This is just to make sure all characters appear in the same in all the text.
   2) Remove Diacritics: Diacritics are small marks that modify the pronunciation of letters. Removing diacritics can help reduce the complexity of the text and standardize it for processing.
   3) Stepwords Removal: Remove common words that do not carry significant meaning (e.g., articles, prepositions, conjunctions). Create a list of Arabic stop words and eliminate them from the text.
+## The Modeling
 <heading>Text Classification using XGBoost and TF-IDF</heading>
 
 <paragraph>
