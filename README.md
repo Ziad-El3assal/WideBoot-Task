@@ -1,8 +1,8 @@
 # WideBot-Task
 <p>
   This is WideBot – AI assignment for Data Scientist intern
-  
 </p>
+
 ## Task 1 - Spelling Checker
 <paragraph> Using this dictionary, implement a spell checker class that takes this dictionary as input, this
 class has three main operations:
