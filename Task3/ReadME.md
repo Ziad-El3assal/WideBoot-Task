@@ -5,9 +5,7 @@
 ## The Modeling
 <heading>Text Classification using XGBoost and TF-IDF</heading>
 
-<paragraph>
-  This project demonstrates a text classification task using the XGBoost algorithm with TF-IDF (Term Frequency-Inverse Document Frequency) features.
-</paragraph>
+
 
 <steps>
   <step number="1">Data Preparation:</step>
